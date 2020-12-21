@@ -56,9 +56,9 @@ class CreateOrderService {
         if (!allInexistentsIds) {
           allInexistentsIds = check.id;
         } else {
-          allInexistentsIds += check.id;
+          allInexistentsIds += `, ${check.id}`;
         }
-        return check;
+        return '';
       });
       throw new AppError(`Could not find products by Ids ${allInexistentsIds}`);
     }
@@ -70,8 +70,18 @@ class CreateOrderService {
     );
 
     if (findProductsWithNoQuantityAvailable.length) {
+      let allInexistentsQuantitiesIds: string | null = null;
+
+      findProductsWithNoQuantityAvailable.map(check => {
+        if (!allInexistentsQuantitiesIds) {
+          allInexistentsQuantitiesIds = `${check.id} (Quantity: ${check.quantity})`;
+        } else {
+          allInexistentsQuantitiesIds += `, ${check.id} (Quantity: ${check.quantity})`;
+        }
+        return '';
+      });
       throw new AppError(
-        `the quantity ${findProductsWithNoQuantityAvailable[0].quantity} is not available for ${findProductsWithNoQuantityAvailable[0].id}`,
+        `The quantity is not available to Ids ${allInexistentsQuantitiesIds}`,
       );
     }
 
